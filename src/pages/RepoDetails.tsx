@@ -109,11 +109,11 @@ export default function RepoDetails() {
       <RepoStatsPanel repo={repo} />
 
       {/* Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_360px] gap-6">
+        <div className="min-w-0">
           <ReadmePreview owner={repo.owner.login} repo={repo.name} />
         </div>
-        <div className="lg:col-span-1">
+        <div>
           <RepoMetaInfo repo={repo} />
         </div>
       </div>

@@ -71,42 +71,42 @@ export function ReadmePreview({ owner, repo }: ReadmePreviewProps) {
         </CardTitle>
       </CardHeader>
       <ScrollArea className="flex-1 max-h-[800px] bg-background">
-        <CardContent className="p-4 sm:p-6 lg:p-8 overflow-hidden max-w-full">
-          <div className="space-y-4 break-words markdown-body">
+        <CardContent className="p-4 sm:p-6 lg:p-8 overflow-hidden max-w-full min-w-0">
+          <div className="space-y-4 min-w-0 max-w-full break-words [overflow-wrap:anywhere] markdown-body">
             {/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */}
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-8 mb-4 border-b pb-2" {...props} />,
-                h2: ({ node, ...props }) => <h2 className="text-2xl font-bold mt-8 mb-4 border-b pb-2" {...props} />,
-                h3: ({ node, ...props }) => <h3 className="text-xl font-bold mt-6 mb-2" {...props} />,
-                h4: ({ node, ...props }) => <h4 className="text-lg font-bold mt-6 mb-2" {...props} />,
-                p: ({ node, ...props }) => <p className="leading-7" {...props} />,
-                ul: ({ node, ...props }) => <ul className="list-disc pl-6 space-y-2" {...props} />,
-                ol: ({ node, ...props }) => <ol className="list-decimal pl-6 space-y-2" {...props} />,
-                li: ({ node, ...props }) => <li className="leading-7" {...props} />,
+                h1: ({ node, ...props }) => <h1 className="text-3xl font-bold mt-8 mb-4 border-b pb-2 break-words" {...props} />,
+                h2: ({ node, ...props }) => <h2 className="text-2xl font-bold mt-8 mb-4 border-b pb-2 break-words" {...props} />,
+                h3: ({ node, ...props }) => <h3 className="text-xl font-bold mt-6 mb-2 break-words" {...props} />,
+                h4: ({ node, ...props }) => <h4 className="text-lg font-bold mt-6 mb-2 break-words" {...props} />,
+                p: ({ node, ...props }) => <p className="leading-7 break-words [overflow-wrap:anywhere]" {...props} />,
+                ul: ({ node, ...props }) => <ul className="list-disc pl-6 space-y-2 break-words" {...props} />,
+                ol: ({ node, ...props }) => <ol className="list-decimal pl-6 space-y-2 break-words" {...props} />,
+                li: ({ node, ...props }) => <li className="leading-7 break-words [overflow-wrap:anywhere]" {...props} />,
                 a: ({ node, ...props }) => (
-                  <a className="text-primary font-medium hover:underline" target="_blank" rel="noreferrer" {...props} />
+                  <a className="text-primary font-medium hover:underline break-words [overflow-wrap:anywhere]" target="_blank" rel="noreferrer" {...props} />
                 ),
                 blockquote: ({ node, ...props }) => (
-                  <blockquote className="border-l-4 border-muted-foreground/30 pl-4 italic text-muted-foreground my-4" {...props} />
+                  <blockquote className="border-l-4 border-muted-foreground/30 pl-4 italic text-muted-foreground my-4 break-words" {...props} />
                 ),
                 pre: ({ node, ...props }) => (
-                  <div className="relative my-4 rounded-md overflow-hidden border bg-muted/50">
-                    <pre className="p-4 overflow-x-auto text-sm font-mono bg-transparent" {...props} />
+                  <div className="relative my-4 max-w-full overflow-hidden rounded-md border bg-muted/50">
+                    <pre className="max-w-full p-4 overflow-x-auto text-sm font-mono bg-transparent whitespace-pre" {...props} />
                   </div>
                 ),
                 code: ({ node, className, children, ...props }: any) => {
                   const match = /language-(\w+)/.exec(className || '');
                   const isInline = !match && !String(children).includes('\n');
                   if (isInline) {
-                    return <code className="bg-muted px-1.5 py-0.5 rounded-md text-sm font-mono" {...props}>{children}</code>;
+                    return <code className="bg-muted px-1.5 py-0.5 rounded-md text-sm font-mono break-words [overflow-wrap:anywhere]" {...props}>{children}</code>;
                   }
-                  return <code className={className} {...props}>{children}</code>;
+                  return <code className={`${className || ''} block min-w-0 text-sm`} {...props}>{children}</code>;
                 },
                 table: ({ node, ...props }) => (
-                  <div className="my-4 w-full overflow-x-auto">
-                    <table className="w-full border-collapse text-sm" {...props} />
+                  <div className="my-4 w-full max-w-full overflow-x-auto">
+                    <table className="w-full min-w-max border-collapse text-sm" {...props} />
                   </div>
                 ),
                 thead: ({ node, ...props }) => <thead className="bg-muted/50" {...props} />,
