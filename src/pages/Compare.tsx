@@ -1,87 +1,60 @@
 import { useState } from 'react';
-import { GitCompare, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { GitCompare } from 'lucide-react';
+import { useGithubUser } from '@/hooks/useGithubUser';
+import { useGithubRepos } from '@/hooks/useGithubRepos';
+import { calculateAnalytics } from '@/utils/calculateAnalytics';
+import { CompareSearch } from '@/components/compare/CompareSearch';
+import { CompareTable } from '@/components/compare/CompareTable';
+import { CompareChart } from '@/components/compare/CompareChart';
+import { ComparisonSummary } from '@/components/compare/ComparisonSummary';
+import { CompareProfileCard } from '@/components/compare/CompareProfileCard';
+import { CompareTopRepos } from '@/components/compare/CompareTopRepos';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Compare() {
-  const [userA, setUserA] = useState('');
-  const [userB, setUserB] = useState('');
-  const [isComparing] = useState(false);
+  const [inputA, setInputA] = useState('');
+  const [inputB, setInputB] = useState('');
+  
+  const [activeA, setActiveA] = useState('');
+  const [activeB, setActiveB] = useState('');
 
-  return (
-    <div className="p-4 lg:p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Compare</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Compare two GitHub profiles side by side
-        </p>
-      </div>
+  const { data: userA, isLoading: loadUserA, error: errUserA } = useGithubUser(activeA);
+  const { data: userB, isLoading: loadUserB, error: errUserB } = useGithubUser(activeB);
 
-      <Separator />
+  const { data: reposA, isLoading: loadReposA } = useGithubRepos(activeA, 1, 100, 'updated');
+  const { data: reposB, isLoading: loadReposB } = useGithubRepos(activeB, 1, 100, 'updated');
 
-      {/* Comparison inputs */}
-      <Card className="bg-card/50">
-        <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex-1 w-full">
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                First User
-              </label>
-              <Input
-                placeholder="e.g. torvalds"
-                value={userA}
-                onChange={(e) => setUserA(e.target.value)}
-              />
-            </div>
-            <div className="flex items-end">
-              <div className="rounded-full bg-muted p-2">
-                <GitCompare className="h-4 w-4 text-muted-foreground" />
-              </div>
-            </div>
-            <div className="flex-1 w-full">
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
-                Second User
-              </label>
-              <Input
-                placeholder="e.g. gaearon"
-                value={userB}
-                onChange={(e) => setUserB(e.target.value)}
-              />
-            </div>
-            <div className="flex items-end">
-              <Button disabled={!userA.trim() || !userB.trim()}>
-                Compare
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+  const isComparing = !!activeA || !!activeB;
+  const isLoading = (!!activeA && loadUserA) || (!!activeB && loadUserB) || (!!activeA && loadReposA) || (!!activeB && loadReposB);
 
-      {/* Comparison results placeholder */}
-      {isComparing ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {[0, 1].map((i) => (
-            <Card key={i} className="bg-card/50">
-              <CardHeader>
-                <CardTitle className="text-base">
-                  <Skeleton className="h-5 w-32" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Skeleton className="h-16 w-16 rounded-full" />
-                <Skeleton className="h-4 w-40" />
-                <Skeleton className="h-3 w-24" />
-                <Skeleton className="h-3 w-32" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
+  const handleCompare = () => {
+    if (inputA && inputB) {
+      setActiveA(inputA);
+      setActiveB(inputB);
+    }
+  };
+
+  const handleClear = () => {
+    setInputA('');
+    setInputB('');
+    setActiveA('');
+    setActiveB('');
+  };
+
+  const handleSwap = () => {
+    setInputA(inputB);
+    setInputB(inputA);
+    if (isComparing) {
+      setActiveA(activeB);
+      setActiveB(activeA);
+    }
+  };
+
+  const renderContent = () => {
+    if (!isComparing) {
+      return (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="rounded-full bg-muted p-4 mb-4">
             <GitCompare className="h-8 w-8 text-muted-foreground" />
@@ -92,7 +65,84 @@ export default function Compare() {
             side-by-side analysis of their profiles.
           </p>
         </div>
-      )}
+      );
+    }
+
+    if (isLoading) {
+      return <LoadingState message="Fetching profiles and repositories for comparison..." className="py-24" />;
+    }
+
+    if (errUserA && errUserB) {
+      return (
+        <div className="py-12">
+           <ErrorState title="Comparison Failed" message="Both GitHub users could not be found." />
+        </div>
+      );
+    }
+
+    const analyticsA = reposA ? calculateAnalytics(reposA) : null;
+    const analyticsB = reposB ? calculateAnalytics(reposB) : null;
+
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+             {errUserA ? (
+               <ErrorState title="User Not Found" message={`Could not find user @${activeA}`} />
+             ) : userA ? (
+               <CompareProfileCard user={userA} />
+             ) : null}
+          </div>
+          <div>
+             {errUserB ? (
+               <ErrorState title="User Not Found" message={`Could not find user @${activeB}`} />
+             ) : userB ? (
+               <CompareProfileCard user={userB} />
+             ) : null}
+          </div>
+        </div>
+
+        {userA && userB && analyticsA && analyticsB && (
+          <div className="space-y-6">
+            <ComparisonSummary userA={userA} analyticsA={analyticsA} userB={userB} analyticsB={analyticsB} />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="lg:col-span-1">
+                <CompareChart userA={userA} analyticsA={analyticsA} userB={userB} analyticsB={analyticsB} />
+              </div>
+              <div className="lg:col-span-1">
+                <CompareTable userA={userA} analyticsA={analyticsA} userB={userB} analyticsB={analyticsB} />
+              </div>
+            </div>
+
+            <CompareTopRepos userA={userA} analyticsA={analyticsA} userB={userB} analyticsB={analyticsB} />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Compare Developers</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Compare two GitHub profiles side by side
+        </p>
+      </div>
+
+      <Separator />
+
+      <CompareSearch 
+        userA={inputA} setUserA={setInputA}
+        userB={inputB} setUserB={setInputB}
+        onCompare={handleCompare}
+        onClear={handleClear}
+        onSwap={handleSwap}
+        isComparing={isComparing}
+      />
+
+      {renderContent()}
     </div>
   );
 }
