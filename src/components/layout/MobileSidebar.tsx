@@ -5,7 +5,6 @@ import {
   GitCompare,
   Bookmark,
   Settings,
-  Telescope,
 } from 'lucide-react';
 import {
   Sheet,
@@ -35,7 +34,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
       <SheetContent side="left" className="w-64 p-0">
         <SheetHeader className="px-4 py-4">
           <SheetTitle className="flex items-center gap-2 text-base">
-            <Telescope className="h-5 w-5 text-primary" />
+            <img src="/logo.svg" alt="RepoScope Logo" className="h-5 w-5" />
             RepoScope
           </SheetTitle>
         </SheetHeader>

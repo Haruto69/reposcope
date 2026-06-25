@@ -6,7 +6,6 @@ import {
   Bookmark,
   Settings,
   ChevronLeft,
-  Telescope,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -35,7 +34,7 @@ export function Sidebar() {
     >
       {/* Logo area */}
       <div className={cn('flex items-center h-14 px-4 border-b border-border', sidebarOpen ? 'gap-2' : 'justify-center')}>
-        <Telescope className="h-5 w-5 text-primary shrink-0" />
+        <img src="/logo.svg" alt="RepoScope Logo" className="h-5 w-5 shrink-0" />
         {sidebarOpen && (
           <span className="font-semibold text-sm tracking-tight truncate">
             RepoScope
