@@ -32,9 +32,9 @@ export function BookmarkedRepos() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
-          className="h-full"
+          className="h-full min-w-0"
         >
-          <Card className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden h-full">
+          <Card className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden h-full min-w-0">
           <CardHeader className="pb-3 flex flex-row items-start justify-between gap-4">
             <div className="space-y-1 overflow-hidden">
               <CardTitle className="text-base truncate flex flex-wrap items-center gap-2 leading-tight">

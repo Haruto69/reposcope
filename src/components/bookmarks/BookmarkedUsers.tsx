@@ -39,9 +39,9 @@ export function BookmarkedUsers() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
-          className="h-full flex"
+          className="h-full flex min-w-0"
         >
-          <Card className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden w-full">
+          <Card className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden w-full min-w-0">
             <CardHeader className="pb-3 flex flex-row items-start justify-between gap-4">
             <div className="flex items-center gap-3 overflow-hidden">
               <Avatar className="h-10 w-10 border border-border/50 shrink-0">
@@ -74,14 +74,14 @@ export function BookmarkedUsers() {
               </Badge>
             </div>
 
-            <div className="flex flex-col xl:flex-row gap-2 pt-3 border-t border-border/50 w-full">
+            <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 pt-3 border-t border-border/50">
               <Button size="sm" className="w-full min-w-0 text-xs h-8" onClick={() => handleOpenDashboard(user.login)}>
-                Dashboard
+                <span className="truncate">Dashboard</span>
               </Button>
-              <Button size="sm" variant="outline" className="w-full min-w-0 text-xs h-8 xl:w-auto" asChild>
-                <a href={user.html_url} target="_blank" rel="noopener noreferrer" title="View on GitHub">
-                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                  GitHub
+              <Button size="sm" variant="outline" className="w-full min-w-0 text-xs h-8" asChild>
+                <a href={user.html_url} target="_blank" rel="noopener noreferrer" title="View on GitHub" className="flex items-center justify-center min-w-0">
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">GitHub</span>
                 </a>
               </Button>
             </div>

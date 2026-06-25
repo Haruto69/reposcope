@@ -49,8 +49,9 @@ export function RecentSearches() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
+            className="min-w-0"
           >
-            <Card className="bg-card/50 hover:bg-card/80 transition-colors cursor-pointer group" onClick={() => handleSearch(search.username)}>
+            <Card className="bg-card/50 hover:bg-card/80 transition-colors cursor-pointer group min-w-0" onClick={() => handleSearch(search.username)}>
               <CardContent className="p-3 flex items-center justify-between">
                 <div className="overflow-hidden">
                   <p className="font-medium text-sm truncate">@{search.username}</p>
