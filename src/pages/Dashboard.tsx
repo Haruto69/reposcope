@@ -11,6 +11,7 @@ import { useGithubUser } from '@/hooks/useGithubUser';
 import { UserProfileCard } from '@/components/user/UserProfileCard';
 import { StatCard } from '@/components/user/StatCard';
 import { SearchHistory } from '@/components/user/SearchHistory';
+import { RepoGrid } from '@/components/repos/RepoGrid';
 
 export default function Dashboard() {
   const { activeUsername } = useAppStore();
@@ -90,30 +91,10 @@ export default function Dashboard() {
           <UserProfileCard user={user} />
         </div>
 
-        {/* Repository list placeholder */}
-        <Card className="lg:col-span-2 bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <FolderGit2 className="h-4 w-4" />
-              Repositories
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-start gap-3 p-3 rounded-md border border-border/50">
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-40" />
-                  <Skeleton className="h-3 w-64" />
-                  <div className="flex gap-3">
-                    <Skeleton className="h-3 w-12" />
-                    <Skeleton className="h-3 w-12" />
-                    <Skeleton className="h-3 w-16" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        {/* Repositories */}
+        <div className="lg:col-span-2">
+          <RepoGrid username={activeUsername} />
+        </div>
       </div>
 
       {/* Analytics row placeholders */}
