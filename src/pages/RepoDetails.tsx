@@ -2,8 +2,8 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
+import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { useGithubRepoDetails } from '@/hooks/useGithubRepoDetails';
 import { RepoStatsPanel } from '@/components/repos/RepoStatsPanel';
 import { RepoMetaInfo } from '@/components/repos/RepoMetaInfo';
@@ -16,7 +16,20 @@ export default function RepoDetails() {
   const { data: repo, isLoading, error, refetch } = useGithubRepoDetails(owner, name);
 
   if (isLoading) {
-    return <LoadingState message="Fetching repository details..." className="min-h-full" />;
+    return (
+      <div className="p-4 lg:p-6 space-y-6 max-w-7xl mx-auto w-full">
+        <SkeletonCard type="generic" />
+        <SkeletonCard type="chart" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <SkeletonCard type="chart" />
+          </div>
+          <div className="lg:col-span-1">
+            <SkeletonCard type="generic" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {

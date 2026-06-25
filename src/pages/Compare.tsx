@@ -9,8 +9,8 @@ import { CompareChart } from '@/components/compare/CompareChart';
 import { ComparisonSummary } from '@/components/compare/ComparisonSummary';
 import { CompareProfileCard } from '@/components/compare/CompareProfileCard';
 import { CompareTopRepos } from '@/components/compare/CompareTopRepos';
-import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
+import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { Separator } from '@/components/ui/separator';
 
 export default function Compare() {
@@ -69,7 +69,18 @@ export default function Compare() {
     }
 
     if (isLoading) {
-      return <LoadingState message="Fetching profiles and repositories for comparison..." className="py-24" />;
+      return (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SkeletonCard type="user" />
+            <SkeletonCard type="user" />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SkeletonCard type="chart" />
+            <SkeletonCard type="chart" />
+          </div>
+        </div>
+      );
     }
 
     if (errUserA && errUserB) {

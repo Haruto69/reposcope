@@ -3,8 +3,8 @@ import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/appStore';
 import { EmptyState } from '@/components/common/EmptyState';
 import { SearchBar } from '@/components/common/SearchBar';
-import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
+import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { useGithubUser } from '@/hooks/useGithubUser';
 import { useGithubRepos } from '@/hooks/useGithubRepos';
 import { UserProfileCard } from '@/components/user/UserProfileCard';
@@ -44,7 +44,24 @@ export default function Dashboard() {
   }
 
   if (isUserLoading) {
-    return <LoadingState message={`Fetching profile for @${activeUsername}...`} className="min-h-[50vh]" />;
+    return (
+      <div className="p-4 lg:p-6 space-y-8 w-full max-w-7xl mx-auto">
+        <div className="space-y-6">
+          <SkeletonCard type="chart" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1 space-y-6">
+               <SkeletonCard type="user" />
+            </div>
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <SkeletonCard type="repo" />
+               <SkeletonCard type="repo" />
+               <SkeletonCard type="repo" />
+               <SkeletonCard type="repo" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (userError) {

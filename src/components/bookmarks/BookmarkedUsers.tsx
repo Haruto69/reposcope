@@ -8,6 +8,8 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { BookmarkButton } from './BookmarkButton';
 
+import { motion } from 'framer-motion';
+
 export function BookmarkedUsers() {
   const { bookmarkedUsers, setActiveUsername, setSearchQuery, addRecentSearch } = useAppStore();
   const navigate = useNavigate();
@@ -31,9 +33,16 @@ export function BookmarkedUsers() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {bookmarkedUsers.map((user) => (
-        <Card key={user.id} className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden">
-          <CardHeader className="pb-3 flex flex-row items-start justify-between gap-4">
+      {bookmarkedUsers.map((user, i) => (
+        <motion.div
+          key={user.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
+          className="h-full flex"
+        >
+          <Card className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden w-full">
+            <CardHeader className="pb-3 flex flex-row items-start justify-between gap-4">
             <div className="flex items-center gap-3 overflow-hidden">
               <Avatar className="h-10 w-10 border border-border/50 shrink-0">
                 <AvatarImage src={user.avatar_url} alt={user.login} />
@@ -77,6 +86,7 @@ export function BookmarkedUsers() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
       ))}
     </div>
   );

@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { FolderGit2, SearchX } from 'lucide-react';
 import { useGithubRepos } from '@/hooks/useGithubRepos';
 import { RepoCard } from './RepoCard';
 import { RepoFilters } from './RepoFilters';
-import { LoadingState } from '@/components/common/LoadingState';
+
+import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { ErrorState } from '@/components/common/ErrorState';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Badge } from '@/components/ui/badge';
@@ -49,8 +51,11 @@ export function RepoGrid({ username }: RepoGridProps) {
 
   if (isLoading) {
     return (
-      <div className="py-12 border rounded-lg bg-card/30">
-        <LoadingState message="Loading repositories..." />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-16">
+        <SkeletonCard type="repo" />
+        <SkeletonCard type="repo" />
+        <SkeletonCard type="repo" />
+        <SkeletonCard type="repo" />
       </div>
     );
   }
@@ -130,8 +135,15 @@ export function RepoGrid({ username }: RepoGridProps) {
             Showing {filteredAndSortedRepos.length} result{filteredAndSortedRepos.length !== 1 ? 's' : ''}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredAndSortedRepos.map((repo) => (
-              <RepoCard key={repo.id} repo={repo} />
+            {filteredAndSortedRepos.map((repo, i) => (
+              <motion.div 
+                key={repo.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
+              >
+                <RepoCard repo={repo} />
+              </motion.div>
             ))}
           </div>
         </div>

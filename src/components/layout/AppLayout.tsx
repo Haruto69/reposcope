@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { MobileSidebar } from './MobileSidebar';
+import { AnimatedPageWrapper } from '@/components/common/AnimatedPageWrapper';
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -25,16 +26,9 @@ export function AppLayout() {
         {/* Page content with route transitions */}
         <main className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-              className="h-full"
-            >
+            <AnimatedPageWrapper key={location.pathname} className="h-full">
               <Outlet />
-            </motion.div>
+            </AnimatedPageWrapper>
           </AnimatePresence>
         </main>
       </div>

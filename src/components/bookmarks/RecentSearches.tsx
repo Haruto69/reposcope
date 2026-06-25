@@ -6,6 +6,8 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { useAppStore } from '@/store/appStore';
 import { formatRelativeDate } from '@/utils/formatNumber';
 
+import { motion } from 'framer-motion';
+
 export function RecentSearches() {
   const { recentSearches, removeRecentSearch, clearRecentSearches, setActiveUsername, setSearchQuery, addRecentSearch } = useAppStore();
   const navigate = useNavigate();
@@ -41,29 +43,36 @@ export function RecentSearches() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-        {recentSearches.map((search) => (
-          <Card key={search.username} className="bg-card/50 hover:bg-card/80 transition-colors cursor-pointer group" onClick={() => handleSearch(search.username)}>
-            <CardContent className="p-3 flex items-center justify-between">
-              <div className="overflow-hidden">
-                <p className="font-medium text-sm truncate">@{search.username}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {formatRelativeDate(search.searched_at)}
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeRecentSearch(search.username);
-                }}
-                title="Remove search"
-              >
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </CardContent>
-          </Card>
+        {recentSearches.map((search, i) => (
+          <motion.div
+            key={search.username}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
+          >
+            <Card className="bg-card/50 hover:bg-card/80 transition-colors cursor-pointer group" onClick={() => handleSearch(search.username)}>
+              <CardContent className="p-3 flex items-center justify-between">
+                <div className="overflow-hidden">
+                  <p className="font-medium text-sm truncate">@{search.username}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {formatRelativeDate(search.searched_at)}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeRecentSearch(search.username);
+                  }}
+                  title="Remove search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </div>

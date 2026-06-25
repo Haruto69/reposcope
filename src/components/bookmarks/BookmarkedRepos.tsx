@@ -9,6 +9,8 @@ import { BookmarkButton } from './BookmarkButton';
 import { formatRelativeDate } from '@/utils/formatNumber';
 import { LanguageBadge } from '@/components/repos/LanguageBadge';
 
+import { motion } from 'framer-motion';
+
 export function BookmarkedRepos() {
   const { bookmarkedRepos } = useAppStore();
 
@@ -24,8 +26,15 @@ export function BookmarkedRepos() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {bookmarkedRepos.map((repo) => (
-        <Card key={repo.id} className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden h-full">
+      {bookmarkedRepos.map((repo, i) => (
+        <motion.div
+          key={repo.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: Math.min(i * 0.05, 0.3) }}
+          className="h-full"
+        >
+          <Card className="bg-card/50 hover:bg-card/80 transition-colors flex flex-col overflow-hidden h-full">
           <CardHeader className="pb-3 flex flex-row items-start justify-between gap-4">
             <div className="space-y-1 overflow-hidden">
               <CardTitle className="text-base truncate flex flex-wrap items-center gap-2 leading-tight">
@@ -78,6 +87,7 @@ export function BookmarkedRepos() {
             </div>
           </CardContent>
         </Card>
+        </motion.div>
       ))}
     </div>
   );
