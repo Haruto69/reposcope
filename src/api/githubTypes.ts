@@ -56,12 +56,16 @@ export interface LanguageStats {
 export interface UserAnalytics {
   totalStars: number;
   totalForks: number;
+  totalWatchers: number;
+  totalOpenIssues: number;
   totalRepos: number;
   languages: LanguageStats;
-  topRepos: GitHubRepo[];
+  topReposByStars: GitHubRepo[];
+  topReposByForks: GitHubRepo[];
   averageStars: number;
   averageForks: number;
   mostUsedLanguage: string;
   accountAge: number;
   reposPerYear: number;
+  lastActiveDate: string | null;
 }

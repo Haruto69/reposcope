@@ -1,6 +1,4 @@
-import { User, GitFork, Star, Code2, Activity, FolderGit2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { User, Activity } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/appStore';
 import { EmptyState } from '@/components/common/EmptyState';
@@ -8,14 +6,25 @@ import { SearchBar } from '@/components/common/SearchBar';
 import { LoadingState } from '@/components/common/LoadingState';
 import { ErrorState } from '@/components/common/ErrorState';
 import { useGithubUser } from '@/hooks/useGithubUser';
+import { useGithubRepos } from '@/hooks/useGithubRepos';
 import { UserProfileCard } from '@/components/user/UserProfileCard';
-import { StatCard } from '@/components/user/StatCard';
 import { SearchHistory } from '@/components/user/SearchHistory';
 import { RepoGrid } from '@/components/repos/RepoGrid';
+import { AnalyticsSummary } from '@/components/analytics/AnalyticsSummary';
+import { LanguageChart } from '@/components/analytics/LanguageChart';
+import { StarsChart } from '@/components/analytics/StarsChart';
+import { ForksChart } from '@/components/analytics/ForksChart';
+import { TopRepos } from '@/components/analytics/TopRepos';
+import { ActivitySummary } from '@/components/analytics/ActivitySummary';
+import { calculateAnalytics } from '@/utils/calculateAnalytics';
 
 export default function Dashboard() {
   const { activeUsername } = useAppStore();
-  const { data: user, isLoading, error, refetch } = useGithubUser(activeUsername);
+  
+  // Use TanStack Query hooks. 
+  // Calling useGithubRepos here shares the cache with RepoGrid, avoiding duplicate network requests.
+  const { data: user, isLoading: isUserLoading, error: userError, refetch: refetchUser } = useGithubUser(activeUsername);
+  const { data: repos } = useGithubRepos(activeUsername, 1, 100);
 
   if (!activeUsername) {
     return (
@@ -34,17 +43,17 @@ export default function Dashboard() {
     );
   }
 
-  if (isLoading) {
+  if (isUserLoading) {
     return <LoadingState message={`Fetching profile for @${activeUsername}...`} className="min-h-[50vh]" />;
   }
 
-  if (error) {
+  if (userError) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] p-6">
         <ErrorState
           title="Profile Fetch Failed"
-          message={error.message}
-          onRetry={() => refetch()}
+          message={userError.message}
+          onRetry={() => refetchUser()}
         />
         <div className="mt-6 flex flex-col items-center">
           <SearchBar className="w-full max-w-sm" />
@@ -58,8 +67,10 @@ export default function Dashboard() {
 
   if (!user) return null;
 
+  const analytics = repos && repos.length > 0 ? calculateAnalytics(repos) : null;
+
   return (
-    <div className="p-4 lg:p-6 space-y-6">
+    <div className="p-4 lg:p-6 space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
@@ -70,24 +81,41 @@ export default function Dashboard() {
 
       <Separator />
 
-      {/* Stats grid (Placeholders for Phase 2) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Repositories', icon: <FolderGit2 className="h-4 w-4" /> },
-          { label: 'Total Stars', icon: <Star className="h-4 w-4" /> },
-          { label: 'Total Forks', icon: <GitFork className="h-4 w-4" /> },
-          { label: 'Languages', icon: <Code2 className="h-4 w-4" /> },
-        ].map((stat) => (
-          <StatCard key={stat.label} label={stat.label} icon={stat.icon}>
-            <Skeleton className="h-7 w-16 mt-2" />
-          </StatCard>
-        ))}
-      </div>
+      {/* Analytics Visualizations (Top Section) */}
+      {analytics && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              Developer Analytics
+            </h2>
+          </div>
+          
+          <AnalyticsSummary analytics={analytics} />
 
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <LanguageChart languages={analytics.languages} />
+            <StarsChart topRepos={analytics.topReposByStars} />
+            <ForksChart topRepos={analytics.topReposByForks} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-1">
+              <ActivitySummary lastActiveDate={analytics.lastActiveDate} />
+            </div>
+            <div className="lg:col-span-2">
+              <TopRepos repos={analytics.topReposByStars} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {analytics && <Separator />}
+
+      {/* Profile & Repo Grid (Bottom Section) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile overview */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <UserProfileCard user={user} />
         </div>
 
@@ -95,39 +123,6 @@ export default function Dashboard() {
         <div className="lg:col-span-2">
           <RepoGrid username={activeUsername} />
         </div>
-      </div>
-
-      {/* Analytics row placeholders */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Language analytics placeholder */}
-        <Card className="bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Code2 className="h-4 w-4" />
-              Language Analytics
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-48 flex items-center justify-center border rounded-md bg-muted/20 border-dashed">
-              <p className="text-sm text-muted-foreground">Chart will appear here</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Stars/forks analytics placeholder */}
-        <Card className="bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Stars & Forks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-48 flex items-center justify-center border rounded-md bg-muted/20 border-dashed">
-              <p className="text-sm text-muted-foreground">Chart will appear here</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
