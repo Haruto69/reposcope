@@ -18,18 +18,15 @@ export function clearGithubToken() {
   delete githubClient.defaults.headers.common['Authorization'];
 }
 
-// Centralized error handler
-function handleApiError(error: unknown): never {
-  if (axios.isAxiosError(error)) {
-    if (error.response?.status === 404) {
-      throw new Error('No GitHub user found with that username.');
-    }
-    if (error.response?.status === 403 && error.response.headers['x-ratelimit-remaining'] === '0') {
-      throw new Error('API rate limit exceeded. Please try again later.');
-    }
-    throw new Error(error.response?.data?.message || 'An error occurred while fetching data from GitHub.');
+// Custom Error Class to wrap API Errors (optional, but helps keep stack clean)
+export class GithubApiError extends Error {
+  public originalError: unknown;
+  
+  constructor(message: string, originalError: unknown) {
+    super(message);
+    this.name = 'GithubApiError';
+    this.originalError = originalError;
   }
-  throw error instanceof Error ? error : new Error('An unknown error occurred.');
 }
 
 // Fetch a GitHub user profile
@@ -38,7 +35,7 @@ export async function fetchGithubUser(username: string): Promise<GitHubUser> {
     const { data } = await githubClient.get<GitHubUser>(`/users/${username}`);
     return data;
   } catch (error) {
-    handleApiError(error);
+    throw new GithubApiError('Failed to fetch user', error);
   }
 }
 
@@ -63,7 +60,7 @@ export async function fetchGithubRepos(
     );
     return data;
   } catch (error) {
-    handleApiError(error);
+    throw new GithubApiError('Failed to fetch repositories', error);
   }
 }
 
@@ -78,7 +75,7 @@ export async function fetchRepoLanguages(
     );
     return data;
   } catch (error) {
-    handleApiError(error);
+    throw new GithubApiError('Failed to fetch languages', error);
   }
 }
 
@@ -88,10 +85,7 @@ export async function fetchGithubRepo(owner: string, repo: string): Promise<GitH
     const { data } = await githubClient.get<GitHubRepo>(`/repos/${owner}/${repo}`);
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      throw new Error('Repository not found.');
-    }
-    handleApiError(error);
+    throw new GithubApiError('Failed to fetch repository', error);
   }
 }
 
@@ -101,10 +95,7 @@ export async function fetchRepoReadme(owner: string, repo: string): Promise<any>
     const { data } = await githubClient.get(`/repos/${owner}/${repo}/readme`);
     return data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return null; // README is optional
-    }
-    handleApiError(error);
+    throw new GithubApiError('Failed to fetch README', error);
   }
 }
 

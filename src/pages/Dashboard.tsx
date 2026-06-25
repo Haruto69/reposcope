@@ -70,6 +70,8 @@ export default function Dashboard() {
         <ErrorState
           title="Profile Fetch Failed"
           message={userError.message}
+          error={userError}
+          context="user"
           onRetry={() => refetchUser()}
         />
         <div className="mt-6 flex flex-col items-center">

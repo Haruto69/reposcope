@@ -6,6 +6,7 @@ import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { MobileSidebar } from './MobileSidebar';
 import { AnimatedPageWrapper } from '@/components/common/AnimatedPageWrapper';
+import { ApiStatusBanner } from '@/components/common/ApiStatusBanner';
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -22,6 +23,7 @@ export function AppLayout() {
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar onMobileMenuToggle={() => setMobileOpen(true)} />
+        <ApiStatusBanner />
 
         {/* Page content with route transitions */}
         <main className="flex-1 overflow-y-auto">

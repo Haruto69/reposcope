@@ -6,6 +6,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useRepoReadme } from '@/hooks/useRepoReadme';
 import { LoadingState } from '@/components/common/LoadingState';
 
+import { ErrorState } from '@/components/common/ErrorState';
+import { parseGithubError } from '@/utils/apiError';
+
 interface ReadmePreviewProps {
   owner: string;
   repo: string;
@@ -24,7 +27,20 @@ export function ReadmePreview({ owner, repo }: ReadmePreviewProps) {
     );
   }
 
-  if (error || !readme) {
+  if (error) {
+    const parsed = parseGithubError(error, 'readme');
+    if (parsed.type !== 'not_found') {
+      return (
+        <Card className="bg-card/50 border-dashed h-full flex flex-col justify-center">
+          <CardContent className="p-6">
+            <ErrorState title="Failed to load README" message={parsed.message} error={error} context="readme" />
+          </CardContent>
+        </Card>
+      );
+    }
+  }
+
+  if (!readme) {
     return (
       <Card className="bg-card/50 border-dashed h-full">
         <CardContent className="flex flex-col items-center justify-center p-12 text-center h-full min-h-[300px]">

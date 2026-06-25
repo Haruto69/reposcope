@@ -65,7 +65,9 @@ export function RepoGrid({ username }: RepoGridProps) {
       <div className="py-6 border rounded-lg bg-card/30">
         <ErrorState 
           title="Failed to load repositories" 
-          message={error.message} 
+          message={error.message}
+          error={error}
+          context="repos"
           onRetry={() => refetch()} 
         />
       </div>

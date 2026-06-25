@@ -38,6 +38,8 @@ export default function RepoDetails() {
         <ErrorState
           title="Repository Not Found"
           message={error.message}
+          error={error}
+          context="repo"
           onRetry={() => refetch()}
         />
         <Button asChild variant="outline" className="mt-6">

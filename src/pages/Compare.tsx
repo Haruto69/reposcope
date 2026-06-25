@@ -20,8 +20,8 @@ export default function Compare() {
   const [activeA, setActiveA] = useState('');
   const [activeB, setActiveB] = useState('');
 
-  const { data: userA, isLoading: loadUserA, error: errUserA } = useGithubUser(activeA);
-  const { data: userB, isLoading: loadUserB, error: errUserB } = useGithubUser(activeB);
+  const { data: userA, isLoading: loadUserA, error: errUserA, refetch: refetchA } = useGithubUser(activeA);
+  const { data: userB, isLoading: loadUserB, error: errUserB, refetch: refetchB } = useGithubUser(activeB);
 
   const { data: reposA, isLoading: loadReposA } = useGithubRepos(activeA, 1, 100, 'updated');
   const { data: reposB, isLoading: loadReposB } = useGithubRepos(activeB, 1, 100, 'updated');
@@ -85,8 +85,14 @@ export default function Compare() {
 
     if (errUserA && errUserB) {
       return (
-        <div className="py-12">
-           <ErrorState title="Comparison Failed" message="Both GitHub users could not be found." />
+        <div className="py-12 border rounded-lg bg-card/30">
+           <ErrorState 
+             title="Comparison Failed" 
+             message="Both GitHub users could not be found." 
+             error={errUserA} 
+             context="user" 
+             onRetry={() => { refetchA(); refetchB(); }} 
+           />
         </div>
       );
     }
@@ -97,16 +103,20 @@ export default function Compare() {
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
+          <div className="h-full">
              {errUserA ? (
-               <ErrorState title="User Not Found" message={`Could not find user @${activeA}`} />
+               <div className="h-full border rounded-lg bg-card/30 flex flex-col justify-center">
+                 <ErrorState title="User Load Failed" message={`Could not load user @${activeA}`} error={errUserA} context="user" onRetry={() => refetchA()} />
+               </div>
              ) : userA ? (
                <CompareProfileCard user={userA} />
              ) : null}
           </div>
-          <div>
+          <div className="h-full">
              {errUserB ? (
-               <ErrorState title="User Not Found" message={`Could not find user @${activeB}`} />
+               <div className="h-full border rounded-lg bg-card/30 flex flex-col justify-center">
+                 <ErrorState title="User Load Failed" message={`Could not load user @${activeB}`} error={errUserB} context="user" onRetry={() => refetchB()} />
+               </div>
              ) : userB ? (
                <CompareProfileCard user={userB} />
              ) : null}

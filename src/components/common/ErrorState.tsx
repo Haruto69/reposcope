@@ -1,10 +1,14 @@
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { parseGithubError, type ParsedApiError } from '@/utils/apiError';
+import { RateLimitWarning } from './RateLimitWarning';
+import { RetryButton } from './RetryButton';
 
 interface ErrorStateProps {
   title?: string;
   message?: string;
+  error?: unknown;
+  context?: 'user' | 'repo' | 'readme' | 'repos';
   onRetry?: () => void;
   className?: string;
 }
@@ -12,13 +16,31 @@ interface ErrorStateProps {
 export function ErrorState({
   title = 'Something went wrong',
   message = 'An unexpected error occurred. Please try again.',
+  error,
+  context,
   onRetry,
   className,
 }: ErrorStateProps) {
+  let finalMessage = message;
+  let parsedError: ParsedApiError | null = null;
+
+  if (error) {
+    parsedError = parseGithubError(error, context);
+    finalMessage = parsedError.message;
+  }
+
+  if (parsedError?.type === 'rate_limit') {
+    return (
+      <div className={cn("flex flex-col items-center justify-center gap-4 py-8 w-full", className)}>
+        <RateLimitWarning resetTime={parsedError.resetTime} className="max-w-md w-full text-left" />
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-4 py-12 text-center',
+        'flex flex-col items-center justify-center gap-4 py-12 text-center w-full',
         className
       )}
     >
@@ -27,13 +49,10 @@ export function ErrorState({
       </div>
       <div className="space-y-1">
         <h3 className="text-lg font-semibold">{title}</h3>
-        <p className="text-sm text-muted-foreground max-w-md">{message}</p>
+        <p className="text-sm text-muted-foreground max-w-md">{finalMessage}</p>
       </div>
-      {onRetry && (
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Try Again
-        </Button>
+      {onRetry && parsedError?.type !== 'not_found' && (
+        <RetryButton onRetry={onRetry} />
       )}
     </div>
   );
