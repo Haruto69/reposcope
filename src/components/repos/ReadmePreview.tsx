@@ -58,7 +58,7 @@ export function ReadmePreview({ owner, repo }: ReadmePreviewProps) {
     const cleanBase64 = readme.content.replace(/\n/g, '');
     // Using decodeURIComponent and escape to handle UTF-8 chars correctly
     decodedContent = decodeURIComponent(escape(window.atob(cleanBase64)));
-  } catch (e) {
+  } catch {
     decodedContent = 'Failed to decode README content.';
   }
 
@@ -73,6 +73,7 @@ export function ReadmePreview({ owner, repo }: ReadmePreviewProps) {
       <ScrollArea className="flex-1 max-h-[800px] bg-background">
         <CardContent className="p-4 sm:p-6 lg:p-8 overflow-hidden max-w-full">
           <div className="space-y-4 break-words markdown-body">
+            {/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */}
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{

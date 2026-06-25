@@ -2,52 +2,32 @@
 
 **Developer analytics from any GitHub profile.**
 
-RepoScope is a GitHub profile and repository analytics dashboard built with React, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, Zustand, Recharts, and the GitHub REST API.
+RepoScope is a professional GitHub developer analytics dashboard built to explore profiles, repositories, languages, activity, bookmarks, and developer comparisons.
 
-> **Status:** Phase 1 Complete — Project setup, routing, layout, and placeholder pages are in place. Real GitHub integration and analytics are coming in later phases.
+Built with **React, TypeScript, Tailwind CSS, shadcn/ui, TanStack Query, Zustand, Recharts, and the GitHub REST API.**
 
 ---
 
 ## Live Demo
 
-Coming soon
+Live Demo: Coming soon
 
 ## Screenshots
 
-Coming soon
+Screenshots: Coming soon
 
 ---
 
-## Features (Phase 1)
+## Features
 
-- App shell with sidebar navigation and top navbar
-- Collapsible desktop sidebar with tooltip support
-- Mobile-responsive drawer navigation
-- Dark / Light / System theme toggle with persistence
-- Client-side routing across all pages
-- Framer Motion page transitions
-- Reusable state components (Loading, Error, Empty)
-- Search bar integrated with Zustand store
-- TanStack Query provider configured
-- Zustand store for theme, sidebar, search history, bookmarks, and active user
-- GitHub REST API client scaffold (Axios)
-- LocalStorage utility for future bookmarks and recent searches
-- Utility functions for number formatting, repo sorting, and analytics calculation
-- shadcn/ui components installed and ready to use
-- TypeScript strict mode with zero build errors
-
-## Planned Features
-
-- GitHub username search with live results
-- User profile dashboard with avatar, bio, and stats
-- Repository list with sorting, filtering, and search
-- Language breakdown charts (Recharts)
-- Stars and forks analytics
-- Individual repository details page
-- Side-by-side developer comparison
-- Bookmarks and recent search history
-- Rate limit handling and error recovery
-- Fully responsive, portfolio-ready UI
+- **Profile & Dashboard**: Search any GitHub username to instantly load their profile, follower stats, and bio.
+- **Repository Analytics**: View public repositories with advanced sorting, language filtering, and live search.
+- **Data Visualizations**: Recharts integration for language breakdowns, top starred repositories, and forks charts.
+- **Repository Details & READMEs**: Dive into individual repositories with real-time markdown rendering of READMEs.
+- **Compare Developers**: Side-by-side analysis of two GitHub profiles to compare languages, stats, and top repositories.
+- **Bookmarks & Persistence**: Save favorite profiles, repositories, and view recent searches (persisted via LocalStorage).
+- **Graceful Error Handling**: Robust Axios and TanStack Query integration to handle rate limits, 404s, offline states, and partial data failures elegantly without crashing the app.
+- **Responsive & Accessible**: Mobile-friendly design featuring dark mode, Framer Motion page transitions, and shadcn/ui accessible components.
 
 ---
 
@@ -61,13 +41,12 @@ Coming soon
 | [Tailwind CSS v4](https://tailwindcss.com) | Utility-first styling |
 | [shadcn/ui](https://ui.shadcn.com) | Accessible component library |
 | [React Router](https://reactrouter.com) | Client-side routing |
-| [TanStack Query](https://tanstack.com/query) | Server state and caching |
-| [Zustand](https://zustand.docs.pmnd.rs) | Client state management |
+| [TanStack Query](https://tanstack.com/query) | Server state, caching, and retries |
+| [Zustand](https://zustand.docs.pmnd.rs) | Client state management (Bookmarks/Theme) |
 | [Axios](https://axios-http.com) | HTTP client |
 | [Recharts](https://recharts.org) | Charting library |
 | [Framer Motion](https://motion.dev) | Animations and transitions |
-| [Lucide React](https://lucide.dev) | Icon library |
-| [React Hook Form](https://react-hook-form.com) + [Zod](https://zod.dev) | Form validation |
+| [React Markdown](https://github.com/remarkjs/react-markdown) | Rendering GitHub READMEs |
 
 ---
 
@@ -75,38 +54,22 @@ Coming soon
 
 ```
 src/
-├── api/                  # GitHub API client and type definitions
-│   ├── githubApi.ts
-│   └── githubTypes.ts
+├── api/                  # GitHub API client, types, and centralized error parser
 ├── assets/               # Static assets
 ├── components/
-│   ├── common/           # Reusable components (LoadingState, ErrorState, etc.)
+│   ├── common/           # Error states, Loading states, Retry buttons, Rate Limit banners
 │   ├── layout/           # AppLayout, Sidebar, Navbar, MobileSidebar
 │   ├── ui/               # shadcn/ui components
-│   ├── user/             # User profile components (future)
-│   ├── repos/            # Repository components (future)
-│   ├── analytics/        # Analytics components (future)
-│   ├── compare/          # Comparison components (future)
-│   └── bookmarks/        # Bookmark components (future)
-├── hooks/                # Custom React hooks
-│   ├── useGithubUser.ts
-│   ├── useGithubRepos.ts
-│   └── useLocalStorage.ts
+│   ├── user/             # User profile and search history
+│   ├── repos/            # Repository grids, filters, and README previews
+│   ├── analytics/        # Recharts visualizations
+│   ├── compare/          # Developer comparison components
+│   └── bookmarks/        # Bookmarked users and repos
+├── hooks/                # TanStack Query hooks
 ├── lib/                  # Shared utilities (cn helper)
-├── pages/                # Route page components
-│   ├── Home.tsx
-│   ├── Dashboard.tsx
-│   ├── Compare.tsx
-│   ├── Bookmarks.tsx
-│   ├── Settings.tsx
-│   ├── RepoDetails.tsx
-│   └── NotFound.tsx
+├── pages/                # Route page components (Dashboard, Compare, RepoDetails, etc.)
 ├── store/                # Zustand state store
-│   └── appStore.ts
-├── utils/                # Utility functions
-│   ├── formatNumber.ts
-│   ├── sortRepos.ts
-│   └── calculateAnalytics.ts
+├── utils/                # Utility functions (sorting, calculating analytics, API error handling)
 ├── App.tsx
 ├── main.tsx
 └── index.css
@@ -152,31 +115,52 @@ npm run build
 
 ---
 
+## Environment & API Notes
+
+RepoScope currently uses the public GitHub REST API without authentication. 
+- Unauthenticated requests are subject to GitHub's rate limit of **60 requests per hour**.
+- The app handles rate limits gracefully by surfacing the exact reset time to the user.
+
+*(Future Improvement: Support for GitHub Personal Access Tokens (PAT) to increase rate limits to 5,000 requests per hour.)*
+
+---
+
+## Deployment Instructions for Vercel
+
+RepoScope is ready to be deployed to [Vercel](https://vercel.com/).
+
+1. Push your code to a GitHub repository.
+2. Import the project into Vercel.
+3. Vercel will automatically detect **Vite**.
+4. Leave the default build command (`npm run build`) and output directory (`dist`).
+5. A `vercel.json` file is already included to handle SPA routing fallback for React Router.
+
+---
+
 ## Phase Roadmap
 
 | Phase | Description | Status |
 |---|---|---|
 | Phase 1 | Project Setup | ✅ Complete |
-| Phase 2 | GitHub User Search | Planned |
-| Phase 3 | Repository Dashboard | Planned |
-| Phase 4 | Developer Analytics | Planned |
-| Phase 5 | Repo Details Page | Planned |
-| Phase 6 | Compare Developers | Planned |
-| Phase 7 | Bookmarks and Recent Searches | Planned |
-| Phase 8 | UI Polish and Responsiveness | Planned |
-| Phase 9 | Error Handling and API Limits | Planned |
-| Phase 10 | Final Resume Version | Planned |
+| Phase 2 | GitHub User Search | ✅ Complete |
+| Phase 3 | Repository Dashboard | ✅ Complete |
+| Phase 4 | Developer Analytics | ✅ Complete |
+| Phase 5 | Repo Details Page | ✅ Complete |
+| Phase 6 | Compare Developers | ✅ Complete |
+| Phase 7 | Bookmarks and Recent Searches | ✅ Complete |
+| Phase 8 | UI Polish and Responsiveness | ✅ Complete |
+| Phase 9 | Error Handling and API Limits | ✅ Complete |
+| Phase 10| Final Resume Version | ✅ Complete |
 
 ---
 
 ## Future Improvements
 
-- GitHub OAuth for higher API rate limits
-- Export analytics as PDF or image
-- Repository activity timeline
-- Contribution heatmap visualization
-- PWA support for offline access
-- Shareable profile links
+- GitHub OAuth/Token support for higher API rate limits.
+- Timeline of repository activity.
+- Export analytics as PDF or image.
+- PWA support for offline access.
+- Shareable dashboard links.
 
 ---
 

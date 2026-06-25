@@ -1,3 +1,4 @@
+import React from 'react';
 import { Clock } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
@@ -8,9 +9,10 @@ interface ActivitySummaryProps {
 export function ActivitySummary({ lastActiveDate }: ActivitySummaryProps) {
   let status = "Low recent activity";
   let dotClass = "bg-muted-foreground";
+  const now = React.useMemo(() => Date.now(), []);
 
   if (lastActiveDate) {
-    const daysSinceActive = (Date.now() - new Date(lastActiveDate).getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceActive = (now - new Date(lastActiveDate).getTime()) / (1000 * 60 * 60 * 24);
     if (daysSinceActive <= 30) {
       status = "Highly active recently";
       dotClass = "bg-green-500";
