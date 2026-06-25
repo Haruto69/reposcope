@@ -174,4 +174,4 @@ RepoScope is ready to be deployed to [Vercel](https://vercel.com/).
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License.
