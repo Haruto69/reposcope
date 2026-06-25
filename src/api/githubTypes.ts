@@ -24,6 +24,10 @@ export interface GitHubRepo {
   id: number;
   name: string;
   full_name: string;
+  owner: {
+    login: string;
+    avatar_url: string;
+  };
   html_url: string;
   description: string | null;
   fork: boolean;
@@ -68,4 +72,18 @@ export interface UserAnalytics {
   accountAge: number;
   reposPerYear: number;
   lastActiveDate: string | null;
+}
+
+export interface ReadmeResponse {
+  name: string;
+  path: string;
+  sha: string;
+  size: number;
+  url: string;
+  html_url: string;
+  git_url: string;
+  download_url: string;
+  type: string;
+  content: string; // Base64 encoded
+  encoding: string;
 }

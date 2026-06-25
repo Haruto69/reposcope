@@ -1,4 +1,5 @@
 import { Star, GitFork, Eye, CircleDot, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,9 +18,9 @@ export function RepoCard({ repo }: RepoCardProps) {
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1 overflow-hidden">
             <CardTitle className="text-base truncate flex flex-wrap items-center gap-2 leading-tight">
-              <a href={repo.html_url} target="_blank" rel="noopener noreferrer" className="hover:underline hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-[300px]">
+              <Link to={`/repo/${repo.full_name}`} className="hover:underline hover:text-primary transition-colors truncate max-w-[200px] sm:max-w-[300px]">
                 {repo.name}
-              </a>
+              </Link>
               {repo.archived && <Badge variant="secondary" className="text-[10px] px-1.5 h-4">Archived</Badge>}
               <Badge variant="outline" className="text-[10px] px-1.5 h-4 capitalize">
                 {repo.visibility}
@@ -38,8 +39,8 @@ export function RepoCard({ repo }: RepoCardProps) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="mt-auto pt-0 pb-4 text-xs text-muted-foreground space-y-3">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      <CardContent className="mt-auto pt-0 pb-4 flex flex-col gap-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
           {repo.language && (
             <LanguageBadge language={repo.language} />
           )}
@@ -68,8 +69,13 @@ export function RepoCard({ repo }: RepoCardProps) {
              </div>
           )}
         </div>
-        <div className="text-[11px]">
-          Updated {formatRelativeDate(repo.updated_at)}
+        <div className="flex items-center justify-between mt-2 pt-3 border-t border-border/50">
+          <div className="text-[11px] text-muted-foreground">
+            Updated {formatRelativeDate(repo.updated_at)}
+          </div>
+          <Button asChild variant="secondary" size="sm" className="h-7 text-xs px-3 font-medium">
+            <Link to={`/repo/${repo.full_name}`}>View details</Link>
+          </Button>
         </div>
       </CardContent>
     </Card>

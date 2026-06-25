@@ -82,4 +82,30 @@ export async function fetchRepoLanguages(
   }
 }
 
+// Fetch a single GitHub repository's details
+export async function fetchGithubRepo(owner: string, repo: string): Promise<GitHubRepo> {
+  try {
+    const { data } = await githubClient.get<GitHubRepo>(`/repos/${owner}/${repo}`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw new Error('Repository not found.');
+    }
+    handleApiError(error);
+  }
+}
+
+// Fetch a repository's README
+export async function fetchRepoReadme(owner: string, repo: string): Promise<any> {
+  try {
+    const { data } = await githubClient.get(`/repos/${owner}/${repo}/readme`);
+    return data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return null; // README is optional
+    }
+    handleApiError(error);
+  }
+}
+
 export { githubClient };
