@@ -5,9 +5,16 @@ import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/appStore';
 import { EmptyState } from '@/components/common/EmptyState';
 import { SearchBar } from '@/components/common/SearchBar';
+import { LoadingState } from '@/components/common/LoadingState';
+import { ErrorState } from '@/components/common/ErrorState';
+import { useGithubUser } from '@/hooks/useGithubUser';
+import { UserProfileCard } from '@/components/user/UserProfileCard';
+import { StatCard } from '@/components/user/StatCard';
+import { SearchHistory } from '@/components/user/SearchHistory';
 
 export default function Dashboard() {
   const { activeUsername } = useAppStore();
+  const { data: user, isLoading, error, refetch } = useGithubUser(activeUsername);
 
   if (!activeUsername) {
     return (
@@ -18,10 +25,37 @@ export default function Dashboard() {
           message="Enter a GitHub username to see their developer analytics."
         >
           <SearchBar className="mt-4 max-w-sm" />
+          <div className="max-w-sm w-full">
+            <SearchHistory />
+          </div>
         </EmptyState>
       </div>
     );
   }
+
+  if (isLoading) {
+    return <LoadingState message={`Fetching profile for @${activeUsername}...`} className="min-h-[50vh]" />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] p-6">
+        <ErrorState
+          title="Profile Fetch Failed"
+          message={error.message}
+          onRetry={() => refetch()}
+        />
+        <div className="mt-6 flex flex-col items-center">
+          <SearchBar className="w-full max-w-sm" />
+          <div className="max-w-sm w-full">
+            <SearchHistory />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) return null;
 
   return (
     <div className="p-4 lg:p-6 space-y-6">
@@ -29,54 +63,34 @@ export default function Dashboard() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Analytics for <span className="font-medium text-foreground">@{activeUsername}</span>
+          Analytics for <span className="font-medium text-foreground">@{user.login}</span>
         </p>
       </div>
 
       <Separator />
 
-      {/* Stats grid */}
+      {/* Stats grid (Placeholders for Phase 2) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Repositories', icon: FolderGit2 },
-          { label: 'Total Stars', icon: Star },
-          { label: 'Total Forks', icon: GitFork },
-          { label: 'Languages', icon: Code2 },
-        ].map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.label} className="bg-card/50">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <Skeleton className="h-7 w-16 mt-2" />
-              </CardContent>
-            </Card>
-          );
-        })}
+          { label: 'Repositories', icon: <FolderGit2 className="h-4 w-4" /> },
+          { label: 'Total Stars', icon: <Star className="h-4 w-4" /> },
+          { label: 'Total Forks', icon: <GitFork className="h-4 w-4" /> },
+          { label: 'Languages', icon: <Code2 className="h-4 w-4" /> },
+        ].map((stat) => (
+          <StatCard key={stat.label} label={stat.label} icon={stat.icon}>
+            <Skeleton className="h-7 w-16 mt-2" />
+          </StatCard>
+        ))}
       </div>
 
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Profile overview */}
-        <Card className="lg:col-span-1 bg-card/50">
-          <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Profile Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Skeleton className="h-16 w-16 rounded-full" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-48" />
-            <Skeleton className="h-3 w-40" />
-          </CardContent>
-        </Card>
+        <div className="lg:col-span-1">
+          <UserProfileCard user={user} />
+        </div>
 
-        {/* Repository list */}
+        {/* Repository list placeholder */}
         <Card className="lg:col-span-2 bg-card/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -102,9 +116,9 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Analytics row */}
+      {/* Analytics row placeholders */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Language analytics */}
+        {/* Language analytics placeholder */}
         <Card className="bg-card/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -113,13 +127,13 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-48 flex items-center justify-center">
+            <div className="h-48 flex items-center justify-center border rounded-md bg-muted/20 border-dashed">
               <p className="text-sm text-muted-foreground">Chart will appear here</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Stars/forks analytics */}
+        {/* Stars/forks analytics placeholder */}
         <Card className="bg-card/50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
@@ -128,7 +142,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-48 flex items-center justify-center">
+            <div className="h-48 flex items-center justify-center border rounded-md bg-muted/20 border-dashed">
               <p className="text-sm text-muted-foreground">Chart will appear here</p>
             </div>
           </CardContent>

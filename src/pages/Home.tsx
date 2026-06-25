@@ -1,28 +1,9 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Telescope, BarChart3, GitCompare, Bookmark } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Telescope, BarChart3, GitCompare, Bookmark } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { useAppStore } from '@/store/appStore';
+import { UserSearch } from '@/components/user/UserSearch';
+import { SearchHistory } from '@/components/user/SearchHistory';
 
 export default function Home() {
-  const [username, setUsername] = useState('');
-  const navigate = useNavigate();
-  const { setActiveUsername, addRecentSearch } = useAppStore();
-
-  const handleSearch = () => {
-    const trimmed = username.trim();
-    if (!trimmed) return;
-    setActiveUsername(trimmed);
-    addRecentSearch(trimmed);
-    navigate('/dashboard');
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSearch();
-  };
-
   const features = [
     {
       icon: BarChart3,
@@ -44,7 +25,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-full px-4 py-12">
       {/* Hero section */}
-      <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-12">
+      <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-12 w-full">
         <div className="flex items-center gap-3 mb-4">
           <div className="rounded-xl bg-primary/10 p-3">
             <Telescope className="h-8 w-8 text-primary" />
@@ -58,20 +39,10 @@ export default function Home() {
           languages, contributions, and more.
         </p>
 
-        {/* Search input */}
-        <div className="flex w-full max-w-md gap-2">
-          <Input
-            type="text"
-            placeholder="Enter a GitHub username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="h-11"
-          />
-          <Button onClick={handleSearch} className="h-11 px-6" disabled={!username.trim()}>
-            Explore
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+        {/* Search Input and History */}
+        <div className="w-full max-w-md flex flex-col items-center">
+          <UserSearch />
+          <SearchHistory />
         </div>
       </div>
 
