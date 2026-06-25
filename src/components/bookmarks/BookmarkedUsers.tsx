@@ -74,13 +74,14 @@ export function BookmarkedUsers() {
               </Badge>
             </div>
 
-            <div className="flex items-center gap-2 pt-3 border-t border-border/50">
-              <Button size="sm" className="w-full text-xs h-8" onClick={() => handleOpenDashboard(user.login)}>
+            <div className="flex flex-col xl:flex-row gap-2 pt-3 border-t border-border/50 w-full">
+              <Button size="sm" className="w-full min-w-0 text-xs h-8" onClick={() => handleOpenDashboard(user.login)}>
                 Dashboard
               </Button>
-              <Button size="icon" variant="outline" className="h-8 w-8 shrink-0" asChild>
+              <Button size="sm" variant="outline" className="w-full min-w-0 text-xs h-8 xl:w-auto" asChild>
                 <a href={user.html_url} target="_blank" rel="noopener noreferrer" title="View on GitHub">
-                  <ExternalLink className="h-3.5 w-3.5" />
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                  GitHub
                 </a>
               </Button>
             </div>

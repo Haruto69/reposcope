@@ -98,7 +98,22 @@ export default function Dashboard() {
 
       <Separator />
 
-      {/* Analytics Visualizations (Top Section) */}
+      {/* Profile & Repo Grid (Top Section) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Profile overview */}
+        <div className="lg:col-span-1 space-y-6">
+          <UserProfileCard user={user} />
+        </div>
+
+        {/* Repositories */}
+        <div className="lg:col-span-2">
+          <RepoGrid username={activeUsername} />
+        </div>
+      </div>
+
+      {analytics && <Separator />}
+
+      {/* Analytics Visualizations (Bottom Section) */}
       {analytics && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
@@ -126,21 +141,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
-      {analytics && <Separator />}
-
-      {/* Profile & Repo Grid (Bottom Section) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile overview */}
-        <div className="lg:col-span-1 space-y-6">
-          <UserProfileCard user={user} />
-        </div>
-
-        {/* Repositories */}
-        <div className="lg:col-span-2">
-          <RepoGrid username={activeUsername} />
-        </div>
-      </div>
     </div>
   );
 }
