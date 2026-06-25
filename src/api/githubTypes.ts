@@ -87,3 +87,38 @@ export interface ReadmeResponse {
   content: string; // Base64 encoded
   encoding: string;
 }
+
+export interface BookmarkedUser {
+  id: number;
+  login: string;
+  name: string | null;
+  avatar_url: string;
+  bio: string | null;
+  html_url: string;
+  followers: number;
+  following: number;
+  public_repos: number;
+  created_at: string;
+  saved_at: string;
+}
+
+export interface BookmarkedRepo {
+  id: number;
+  name: string;
+  full_name: string;
+  owner_login: string;
+  owner_avatar: string;
+  description: string | null;
+  html_url: string;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  open_issues_count: number;
+  updated_at: string;
+  saved_at: string;
+}
+
+export interface RecentSearch {
+  username: string;
+  searched_at: string;
+}

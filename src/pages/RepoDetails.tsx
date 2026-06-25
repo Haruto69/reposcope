@@ -9,6 +9,7 @@ import { RepoStatsPanel } from '@/components/repos/RepoStatsPanel';
 import { RepoMetaInfo } from '@/components/repos/RepoMetaInfo';
 import { ReadmePreview } from '@/components/repos/ReadmePreview';
 import { LanguageBadge } from '@/components/repos/LanguageBadge';
+import { BookmarkButton } from '@/components/bookmarks/BookmarkButton';
 
 export default function RepoDetails() {
   const { owner, name } = useParams<{ owner: string; name: string }>();
@@ -76,12 +77,15 @@ export default function RepoDetails() {
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
             {repo.language && <LanguageBadge language={repo.language} />}
-            <Button asChild variant="outline" size="sm" className="h-8">
-              <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-3.5 w-3.5" />
-                View on GitHub
-              </a>
-            </Button>
+            <div className="flex items-center gap-2">
+              <BookmarkButton itemType="repo" repo={repo} />
+              <Button asChild variant="outline" size="sm" className="h-9">
+                <a href={repo.html_url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-3.5 w-3.5" />
+                  View on GitHub
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>

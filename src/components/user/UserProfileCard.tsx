@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDate } from '@/utils/formatNumber';
+import { BookmarkButton } from '@/components/bookmarks/BookmarkButton';
 import type { GitHubUser } from '@/api/githubTypes';
 
 interface UserProfileCardProps {
@@ -26,11 +27,14 @@ export function UserProfileCard({ user }: UserProfileCardProps) {
                 <h2 className="text-xl font-bold tracking-tight">{user.name || user.login}</h2>
                 <p className="text-sm text-muted-foreground">@{user.login}</p>
               </div>
-              <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
-                <a href={user.html_url} target="_blank" rel="noopener noreferrer">
-                  View Profile <ExternalLink className="ml-2 h-3.5 w-3.5" />
-                </a>
-              </Button>
+              <div className="flex items-center gap-2">
+                <BookmarkButton itemType="user" user={user} />
+                <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
+                  <a href={user.html_url} target="_blank" rel="noopener noreferrer">
+                    View Profile <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                  </a>
+                </Button>
+              </div>
             </div>
             
             {user.bio && (

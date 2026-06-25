@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatRelativeDate } from '@/utils/formatNumber';
 import { LanguageBadge } from './LanguageBadge';
+import { BookmarkButton } from '@/components/bookmarks/BookmarkButton';
 import type { GitHubRepo } from '@/api/githubTypes';
 
 interface RepoCardProps {
@@ -32,11 +33,14 @@ export function RepoCard({ repo }: RepoCardProps) {
               </CardDescription>
             )}
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" asChild>
-            <a href={repo.html_url} target="_blank" rel="noopener noreferrer" title="View on GitHub">
-              <ExternalLink className="h-4 w-4 text-muted-foreground" />
-            </a>
-          </Button>
+          <div className="flex items-center gap-1 shrink-0">
+            <BookmarkButton itemType="repo" repo={repo} compact />
+            <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+              <a href={repo.html_url} target="_blank" rel="noopener noreferrer" title="View on GitHub">
+                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              </a>
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="mt-auto pt-0 pb-4 flex flex-col gap-3">

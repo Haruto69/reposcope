@@ -1,11 +1,6 @@
 import { create } from 'zustand';
 import { getLocalStorageItem, setLocalStorageItem } from '@/hooks/useLocalStorage';
-
-interface BookmarkEntry {
-  type: 'user' | 'repo';
-  name: string;
-  addedAt: string;
-}
+import type { BookmarkedUser, BookmarkedRepo, RecentSearch } from '@/api/githubTypes';
 
 interface AppState {
   // Theme
@@ -20,20 +15,38 @@ interface AppState {
   // Search
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  recentSearches: string[];
+  recentSearches: RecentSearch[];
   addRecentSearch: (query: string) => void;
+  removeRecentSearch: (query: string) => void;
   clearRecentSearches: () => void;
 
-  // Bookmarks
-  bookmarks: BookmarkEntry[];
-  addBookmark: (entry: BookmarkEntry) => void;
-  removeBookmark: (name: string) => void;
-  isBookmarked: (name: string) => boolean;
+  // Bookmarked Users
+  bookmarkedUsers: BookmarkedUser[];
+  addBookmarkedUser: (user: BookmarkedUser) => void;
+  removeBookmarkedUser: (login: string) => void;
+  isUserBookmarked: (login: string) => boolean;
+
+  // Bookmarked Repos
+  bookmarkedRepos: BookmarkedRepo[];
+  addBookmarkedRepo: (repo: BookmarkedRepo) => void;
+  removeBookmarkedRepo: (fullName: string) => void;
+  isRepoBookmarked: (fullName: string) => boolean;
 
   // Active username for dashboard
   activeUsername: string | null;
   setActiveUsername: (username: string | null) => void;
 }
+
+// Migration for recent searches if they were just strings
+const getMigratedRecentSearches = (): RecentSearch[] => {
+  const raw = getLocalStorageItem<any[]>('reposcope-recent-searches', []);
+  return raw.map(item => {
+    if (typeof item === 'string') {
+      return { username: item, searched_at: new Date().toISOString() };
+    }
+    return item as RecentSearch;
+  });
+};
 
 export const useAppStore = create<AppState>((set, get) => ({
   // Theme
@@ -52,10 +65,15 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Search
   searchQuery: '',
   setSearchQuery: (query) => set({ searchQuery: query }),
-  recentSearches: getLocalStorageItem<string[]>('reposcope-recent-searches', []),
+  recentSearches: getMigratedRecentSearches(),
   addRecentSearch: (query) => {
-    const current = get().recentSearches.filter((s) => s !== query);
-    const updated = [query, ...current].slice(0, 10);
+    const current = get().recentSearches.filter((s) => s.username.toLowerCase() !== query.toLowerCase());
+    const updated = [{ username: query, searched_at: new Date().toISOString() }, ...current].slice(0, 10);
+    set({ recentSearches: updated });
+    setLocalStorageItem('reposcope-recent-searches', updated);
+  },
+  removeRecentSearch: (query) => {
+    const updated = get().recentSearches.filter((s) => s.username.toLowerCase() !== query.toLowerCase());
     set({ recentSearches: updated });
     setLocalStorageItem('reposcope-recent-searches', updated);
   },
@@ -64,19 +82,35 @@ export const useAppStore = create<AppState>((set, get) => ({
     setLocalStorageItem('reposcope-recent-searches', []);
   },
 
-  // Bookmarks
-  bookmarks: getLocalStorageItem<BookmarkEntry[]>('reposcope-bookmarks', []),
-  addBookmark: (entry) => {
-    const updated = [...get().bookmarks, entry];
-    set({ bookmarks: updated });
-    setLocalStorageItem('reposcope-bookmarks', updated);
+  // Bookmarked Users
+  bookmarkedUsers: getLocalStorageItem<BookmarkedUser[]>('reposcope-bookmarked-users', []),
+  addBookmarkedUser: (user) => {
+    if (get().isUserBookmarked(user.login)) return;
+    const updated = [...get().bookmarkedUsers, user];
+    set({ bookmarkedUsers: updated });
+    setLocalStorageItem('reposcope-bookmarked-users', updated);
   },
-  removeBookmark: (name) => {
-    const updated = get().bookmarks.filter((b) => b.name !== name);
-    set({ bookmarks: updated });
-    setLocalStorageItem('reposcope-bookmarks', updated);
+  removeBookmarkedUser: (login) => {
+    const updated = get().bookmarkedUsers.filter((u) => u.login !== login);
+    set({ bookmarkedUsers: updated });
+    setLocalStorageItem('reposcope-bookmarked-users', updated);
   },
-  isBookmarked: (name) => get().bookmarks.some((b) => b.name === name),
+  isUserBookmarked: (login) => get().bookmarkedUsers.some((u) => u.login === login),
+
+  // Bookmarked Repos
+  bookmarkedRepos: getLocalStorageItem<BookmarkedRepo[]>('reposcope-bookmarked-repos', []),
+  addBookmarkedRepo: (repo) => {
+    if (get().isRepoBookmarked(repo.full_name)) return;
+    const updated = [...get().bookmarkedRepos, repo];
+    set({ bookmarkedRepos: updated });
+    setLocalStorageItem('reposcope-bookmarked-repos', updated);
+  },
+  removeBookmarkedRepo: (fullName) => {
+    const updated = get().bookmarkedRepos.filter((r) => r.full_name !== fullName);
+    set({ bookmarkedRepos: updated });
+    setLocalStorageItem('reposcope-bookmarked-repos', updated);
+  },
+  isRepoBookmarked: (fullName) => get().bookmarkedRepos.some((r) => r.full_name === fullName),
 
   // Active username
   activeUsername: null,

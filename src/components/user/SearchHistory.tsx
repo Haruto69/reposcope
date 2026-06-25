@@ -1,10 +1,10 @@
-import { Clock } from 'lucide-react';
+import { Clock, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/store/appStore';
 import { useNavigate } from 'react-router-dom';
 
 export function SearchHistory() {
-  const { recentSearches, addRecentSearch, setActiveUsername, setSearchQuery } = useAppStore();
+  const { recentSearches, addRecentSearch, removeRecentSearch, setActiveUsername, setSearchQuery } = useAppStore();
   const navigate = useNavigate();
 
   if (recentSearches.length === 0) return null;
@@ -23,16 +23,26 @@ export function SearchHistory() {
         Recent Searches
       </h3>
       <div className="flex flex-wrap gap-2">
-        {recentSearches.map((username) => (
-          <Button
-            key={username}
-            variant="secondary"
-            size="sm"
-            onClick={() => handleSearch(username)}
-            className="rounded-full px-4"
-          >
-            {username}
-          </Button>
+        {recentSearches.map((search) => (
+          <div key={search.username} className="flex items-center bg-secondary text-secondary-foreground rounded-full pl-3 pr-1 py-1 transition-colors">
+            <span 
+              className="text-sm font-medium cursor-pointer hover:underline mr-2"
+              onClick={() => handleSearch(search.username)}
+            >
+              {search.username}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 rounded-full hover:bg-background/20 shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeRecentSearch(search.username);
+              }}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
         ))}
       </div>
     </div>
